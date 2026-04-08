@@ -141,11 +141,15 @@ export default function Admin() {
                 <td style={s.td}>
                   {o.paymentMethod === 'online' ? '💳 Online' : '🚚 COD'}
                   <br />
-                  <small style={{ color: o.paymentStatus === 'paid' ? 'green' : '#f0a500' }}>
-                    {o.paymentStatus === 'paid' ? 'Paid' : 'Unpaid'}
+                  <small style={{ color: (o.paymentStatus === 'paid' || o.status === 'delivered') ? 'green' : '#f0a500' }}>
+                    {(o.paymentStatus === 'paid' || o.status === 'delivered') ? '✓ Paid' : 'Unpaid'}
                   </small>
                 </td>
-                <td style={s.td}>{o.status}</td>
+                <td style={s.td}>
+                  <span style={{ padding: '3px 10px', borderRadius: '12px', color: '#fff', fontSize: '0.8rem', fontWeight: 'bold', background: { pending: '#f0a500', processing: '#1a73e8', shipped: '#7b1fa2', delivered: '#2e7d32' }[o.status] || '#888' }}>
+                    {o.status}
+                  </span>
+                </td>
                 <td style={s.td}>
                   <select value={o.status} onChange={e => updateOrderStatus(o._id, e.target.value)} style={{ padding: '4px', borderRadius: '4px' }}>
                     {['pending', 'processing', 'shipped', 'delivered'].map(st => <option key={st} value={st}>{st}</option>)}

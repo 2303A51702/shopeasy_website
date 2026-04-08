@@ -15,11 +15,11 @@ router.post('/signup', async (req, res) => {
     const user = await User.create({ name, email, password: hashed });
 
     const token = jwt.sign(
-      { id: user._id, isAdmin: user.isAdmin },
+      { id: user._id, isAdmin: user.isAdmin, isDeliveryPartner: user.isDeliveryPartner },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
-    res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin } });
+    res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin, isDeliveryPartner: user.isDeliveryPartner } });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -36,11 +36,11 @@ router.post('/login', async (req, res) => {
     if (!match) return res.status(400).json({ message: 'Invalid credentials' });
 
     const token = jwt.sign(
-      { id: user._id, isAdmin: user.isAdmin },
+      { id: user._id, isAdmin: user.isAdmin, isDeliveryPartner: user.isDeliveryPartner },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
-    res.json({ token, user: { id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin } });
+    res.json({ token, user: { id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin, isDeliveryPartner: user.isDeliveryPartner } });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

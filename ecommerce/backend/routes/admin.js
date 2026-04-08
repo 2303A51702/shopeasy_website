@@ -60,8 +60,37 @@ router.delete('/products/:id', adminAuth, async (req, res) => {
 // Get all orders
 router.get('/orders', adminAuth, async (req, res) => {
   try {
-    const orders = await Order.find().populate('user', 'name email').sort({ createdAt: -1 });
+    const orders = await Order.find()
+      .populate('user', 'name email')
+      .populate('assignedTo', 'name email')
+      .sort({ createdAt: -1 });
     res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get all delivery partners
+router.get('/delivery-partners', adminAuth, async (req, res) => {
+  try {
+    const User = require('../models/User');
+    const partners = await User.find({ isDeliveryPartner: true }, 'name email');
+    res.json(partners);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Assign delivery partner to order
+router.put('/orders/:id/assign', adminAuth, async (req, res) => {
+  try {
+    const { partnerId } = req.body;
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { assignedTo: partnerId, status: 'processing' },
+      { new: true }
+    ).populate('assignedTo', 'name email');
+    res.json(order);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -70,7 +99,15 @@ router.get('/orders', adminAuth, async (req, res) => {
 // Update order status
 router.put('/orders/:id', adminAuth, async (req, res) => {
   try {
-    const order = await Order.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
+    const { status } = req.body;
+    const updates = { status };
+
+    // Auto-mark COD as paid when delivered
+    if (status === 'delivered') {
+      updates.paymentStatus = 'paid';
+    }
+
+    const order = await Order.findByIdAndUpdate(req.params.id, updates, { new: true });
     res.json(order);
   } catch (err) {
     res.status(500).json({ message: err.message });

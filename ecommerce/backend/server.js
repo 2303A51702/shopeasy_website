@@ -25,6 +25,7 @@ app.use('/api/products', require('./routes/products'));
 app.use('/api/cart', require('./routes/cart'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/delivery', require('./routes/delivery'));
 
 // Connect to DB then start server
 const PORT = process.env.PORT || 5000;

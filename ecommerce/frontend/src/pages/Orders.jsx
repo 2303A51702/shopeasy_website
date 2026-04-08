@@ -40,7 +40,7 @@ export default function Orders() {
                 Payment: <strong>{order.paymentMethod === 'online' ? '💳 Online' : '🚚 Cash on Delivery'}</strong>
                 {' · '}
                 <span style={{ color: order.paymentStatus === 'paid' ? 'green' : '#f0a500' }}>
-                  {order.paymentStatus === 'paid' ? '✓ Paid' : 'Pay on delivery'}
+                  {order.paymentStatus === 'paid' ? '✓ Paid' : order.status === 'delivered' ? '✓ Paid' : 'Pay on delivery'}
                 </span>
               </div>
             </div>

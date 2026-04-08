@@ -20,4 +20,11 @@ const adminAuth = (req, res, next) => {
   });
 };
 
-module.exports = { auth, adminAuth };
+const deliveryAuth = (req, res, next) => {
+  auth(req, res, () => {
+    if (!req.user.isDeliveryPartner && !req.user.isAdmin) return res.status(403).json({ message: 'Delivery partner access required' });
+    next();
+  });
+};
+
+module.exports = { auth, adminAuth, deliveryAuth };
