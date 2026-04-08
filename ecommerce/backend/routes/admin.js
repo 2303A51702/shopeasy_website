@@ -96,6 +96,32 @@ router.put('/orders/:id/assign', adminAuth, async (req, res) => {
   }
 });
 
+// Get all delivery partners
+router.get('/delivery-partners', adminAuth, async (req, res) => {
+  try {
+    const User = require('../models/User');
+    const partners = await User.find({ isDeliveryPartner: true }, 'name email phone');
+    res.json(partners);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Assign delivery partner + set processing
+router.put('/orders/:id/assign', adminAuth, async (req, res) => {
+  try {
+    const { partnerId } = req.body;
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { assignedTo: partnerId, status: 'processing' },
+      { new: true }
+    ).populate('assignedTo', 'name email');
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Update order status
 router.put('/orders/:id', adminAuth, async (req, res) => {
   try {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
 
-const statusColor = { pending: '#f0a500', processing: '#1a73e8', shipped: '#7b1fa2', delivered: '#2e7d32' };
+const statusColor = { pending: '#f0a500', processing: '#1a73e8', out_for_delivery: '#f57c00', delivered: '#2e7d32' };
 
 const s = {
   container: { maxWidth: '800px', margin: '0 auto', padding: '24px 16px' },
@@ -45,7 +45,7 @@ export default function Orders() {
               </div>
             </div>
             <span style={{ ...s.badge, background: statusColor[order.status] || '#888' }}>
-              {order.status}
+              {order.status?.replace('_', ' ')}
             </span>
           </div>
           {order.items.map((item, i) => (

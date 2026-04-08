@@ -24,10 +24,13 @@ export default function Admin() {
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState(null);
 
+  const [deliveryPartners, setDeliveryPartners] = useState([]);
+
   const fetchProducts = () => api.get('/admin/products').then(r => setProducts(r.data)).catch(err => alert('Products fetch failed: ' + (err.response?.data?.message || err.message)));
   const fetchOrders = () => api.get('/admin/orders').then(r => setOrders(r.data)).catch(err => alert('Orders fetch failed: ' + (err.response?.data?.message || err.message)));
+  const fetchDeliveryPartners = () => api.get('/admin/delivery-partners').then(r => setDeliveryPartners(r.data)).catch(() => {});
 
-  useEffect(() => { fetchProducts(); fetchOrders(); }, []);
+  useEffect(() => { fetchProducts(); fetchOrders(); fetchDeliveryPartners(); }, []);
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -64,6 +67,15 @@ export default function Admin() {
     fetchOrders();
   };
 
+  const assignPartner = async (orderId, partnerId) => {
+    if (!partnerId) return;
+    try {
+      await api.put(`/admin/orders/${orderId}/assign`, { partnerId });
+      fetchOrders();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Error assigning partner');
+    }
+  };
   return (
     <div style={s.container}>
       <h2 style={{ marginBottom: '16px' }}>Admin Panel</h2>
@@ -126,12 +138,12 @@ export default function Admin() {
         <table style={s.table}>
           <thead>
             <tr>
-              {['Order ID', 'Customer', 'Total', 'Address', 'Payment', 'Status', 'Update'].map(h => <th key={h} style={s.th}>{h}</th>)}
+              {['Order ID', 'Customer', 'Total', 'Address', 'Payment', 'Assign Partner', 'Status', 'Update'].map(h => <th key={h} style={s.th}>{h}</th>)}
             </tr>
           </thead>
           <tbody>
             {orders.length === 0 ? (
-              <tr><td colSpan="7" style={{ ...s.td, textAlign: 'center', color: '#888', padding: '24px' }}>No orders found</td></tr>
+              <tr><td colSpan="8" style={{ ...s.td, textAlign: 'center', color: '#888', padding: '24px' }}>No orders found</td></tr>
             ) : orders.map(o => (
               <tr key={o._id}>
                 <td style={s.td}>{o._id.slice(-6)}</td>
@@ -146,13 +158,22 @@ export default function Admin() {
                   </small>
                 </td>
                 <td style={s.td}>
-                  <span style={{ padding: '3px 10px', borderRadius: '12px', color: '#fff', fontSize: '0.8rem', fontWeight: 'bold', background: { pending: '#f0a500', processing: '#1a73e8', shipped: '#7b1fa2', delivered: '#2e7d32' }[o.status] || '#888' }}>
-                    {o.status}
+                  {o.assignedTo
+                    ? <span style={{ color: '#1a73e8', fontSize: '0.85rem' }}>🚚 {o.assignedTo.name || o.assignedTo}</span>
+                    : <select defaultValue="" onChange={e => assignPartner(o._id, e.target.value)} style={{ padding: '4px', borderRadius: '4px', fontSize: '0.82rem' }}>
+                        <option value="" disabled>Assign partner</option>
+                        {deliveryPartners.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
+                      </select>
+                  }
+                </td>
+                <td style={s.td}>
+                  <span style={{ padding: '3px 10px', borderRadius: '12px', color: '#fff', fontSize: '0.8rem', fontWeight: 'bold', background: { pending: '#f0a500', processing: '#1a73e8', out_for_delivery: '#f57c00', delivered: '#2e7d32' }[o.status] || '#888' }}>
+                    {o.status?.replace('_', ' ')}
                   </span>
                 </td>
                 <td style={s.td}>
                   <select value={o.status} onChange={e => updateOrderStatus(o._id, e.target.value)} style={{ padding: '4px', borderRadius: '4px' }}>
-                    {['pending', 'processing', 'shipped', 'delivered'].map(st => <option key={st} value={st}>{st}</option>)}
+                    {['pending', 'processing', 'out_for_delivery', 'delivered'].map(st => <option key={st} value={st}>{st.replace('_', ' ')}</option>)}
                   </select>
                 </td>
               </tr>

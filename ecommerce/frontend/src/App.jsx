@@ -8,6 +8,9 @@ import Cart from './pages/Cart';
 import Orders from './pages/Orders';
 import Admin from './pages/Admin';
 import ProductDetail from './pages/ProductDetail';
+import DeliveryLogin from './pages/DeliveryLogin';
+import DeliverySignup from './pages/DeliverySignup';
+import DeliveryDashboard from './pages/DeliveryDashboard';
 
 export const AuthContext = createContext(null);
 export function useAuth() { return useContext(AuthContext); }
@@ -52,6 +55,9 @@ export default function App() {
           <Route path="/cart" element={<PrivateRoute><Cart /></PrivateRoute>} />
           <Route path="/orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
           <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+          <Route path="/delivery/login" element={<DeliveryLogin />} />
+          <Route path="/delivery/signup" element={<DeliverySignup />} />
+          <Route path="/delivery/dashboard" element={<DeliveryDashboard />} />
         </Routes>
       </BrowserRouter>
     </AuthContext.Provider>

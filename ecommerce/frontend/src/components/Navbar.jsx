@@ -21,8 +21,7 @@ export default function Navbar() {
       <Link to="/" style={styles.brand}>ShopEasy</Link>
       <div style={styles.links}>
         <Link to="/" style={styles.link}>Products</Link>
-        {user ? (
-          <>
+        {user ? (          <>
             <Link to="/cart" style={styles.link}>Cart</Link>
             <Link to="/orders" style={styles.link}>My Orders</Link>
             {user.isAdmin && <Link to="/admin" style={styles.link}>Admin</Link>}
@@ -32,6 +31,7 @@ export default function Navbar() {
           <>
             <Link to="/login" style={styles.link}>Login</Link>
             <Link to="/signup" style={styles.link}>Sign Up</Link>
+            <Link to="/delivery/login" style={{ ...styles.link, color: '#f57c00' }}>🚚 Delivery Login</Link>
           </>
         )}
       </div>
